@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "superview/version"
+require "active_support/concern"
 
 module Superview
   class Error < StandardError; end
