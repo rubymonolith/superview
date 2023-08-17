@@ -1,24 +1,66 @@
 # Superview
 
-TODO: Delete this and the text below, and describe your gem
+Include in controllers to map action names to class names. This makes it possible to embed Phlex components directly into Rails controllers without having to go through other templating systems like Erb.
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/superview`. To experiment with that code, run `bin/console` for an interactive prompt.
+Instance methods will be assigned to views that have `attr_accessor` methods.
+
+Consider a blog post controller:
+
+```ruby
+class PostsController < ApplicationController
+  include Superview::Actions
+
+  before_action :load_post
+
+  class Show < ApplicationComponent
+    attr_accessor :post
+
+    def template(&)
+      h1 { @post.title }
+      div(class: "prose") { @post.body }
+    end
+  end
+
+  private
+    def load_post
+      @post = Post.find(params[:id])
+    end
+end
+```
+
+The `@post` variable gets set in the `Show` view class via `Show#post=`.
 
 ## Installation
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
-
 Install the gem and add to the application's Gemfile by executing:
 
-    $ bundle add UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG
+    $ bundle add superview
 
 If bundler is not being used to manage dependencies, install the gem by executing:
 
-    $ gem install UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG
+    $ gem install superview
 
 ## Usage
 
-TODO: Write usage instructions here
+Install `phlex-rails` in your application.
+
+    $ bin/rails generate phlex:install
+
+Then include the following any controller you'd like to render Phlex components.
+
+```ruby
+class PostsController < ApplicationController
+  include Superview::Actions
+
+  class Show < ApplicationComponent
+    def template(&)
+      h1 { "Hello World" }
+    end
+  end
+end
+```
+
+The `Show` class will render when the `PostsController#show` action is called.
 
 ## Development
 
