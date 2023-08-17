@@ -1,10 +1,6 @@
 # Superview
 
-Include in controllers to map action names to class names. This makes it possible to embed Phlex components directly into Rails controllers without having to go through other templating systems like Erb.
-
-Instance methods will be assigned to views that have `attr_accessor` methods.
-
-Consider a blog post controller:
+Build Rails applications, from the ground up, using [Phlex](https://www.phlex.fun/) components, like this.
 
 ```ruby
 class PostsController < ApplicationController
@@ -28,8 +24,6 @@ class PostsController < ApplicationController
 end
 ```
 
-The `@post` variable gets set in the `Show` view class via `Show#post=`.
-
 ## Installation
 
 Install the gem and add to the application's Gemfile by executing:
@@ -42,25 +36,64 @@ If bundler is not being used to manage dependencies, install the gem by executin
 
 ## Usage
 
-Install `phlex-rails` in your application.
+Install `phlex-rails` in your Rails application.
 
     $ bin/rails generate phlex:install
 
-Then include the following any controller you'd like to render Phlex components.
+Then add `include Superview::Actions` to any controllers you'd like to render Phlex components.
 
 ```ruby
 class PostsController < ApplicationController
   include Superview::Actions
 
+  before_action :load_post
+
   class Show < ApplicationComponent
+    attr_accessor :post
+
     def template(&)
-      h1 { "Hello World" }
+      h1 { @post.title }
+      div(class: "prose") { @post.body }
     end
   end
+
+  private
+    def load_post
+      @post = Post.find(params[:id])
+    end
 end
 ```
 
-The `Show` class will render when the `PostsController#show` action is called.
+The `Show` class will render when the `PostsController#show` action is called. To use along side other formats or render manually, you can define the `PostsController#show` as you'd expect:
+
+```ruby
+class PostsController < ApplicationController
+  include Superview::Actions
+
+  before_action :load_post
+
+  class Show < ApplicationComponent
+    attr_accessor :post
+
+    def template(&)
+      h1 { @post.title }
+      div(class: "prose") { @post.body }
+    end
+  end
+
+  def show
+    respond_to do |format|
+      format.html { render Show.new.tap { _1.post = @post } }
+      format.json { render json: @post }
+    end
+  end
+
+  private
+    def load_post
+      @post = Post.find(params[:id])
+    end
+end
+```
 
 ## Development
 
