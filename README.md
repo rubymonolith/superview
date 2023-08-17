@@ -24,6 +24,11 @@ class PostsController < ApplicationController
 end
 ```
 
+Read more about it at:
+
+* [Component driven development on Rails with Phlex](https://fly.io/ruby-dispatch/component-driven-development-on-rails-with-phlex/)
+* [Hacking Rails Implicit Rendering for View Components & Fun](https://fly.io/ruby-dispatch/hacking-rails-implicit-rendering-for-view-components/)
+
 ## Installation
 
 Install the gem and add to the application's Gemfile by executing:
