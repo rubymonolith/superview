@@ -3,6 +3,7 @@ PATH
   specs:
     superview (0.1.0)
       phlex-rails (~> 1.0)
+      zeitwerk (~> 2.0)
 
 GEM
   remote: https://rubygems.org/
