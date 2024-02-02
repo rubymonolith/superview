@@ -100,6 +100,51 @@ class PostsController < ApplicationController
 end
 ```
 
+### Extracting inline views into the `./app/views` folder
+
+Inline views are an amazingly productive way of prototyping apps, but as it matures you might be inclined to extract these views into the `./app/views` folders for organizational purposes or so you can share them between controllers.
+
+First let's extract the `Show` class into `./app/views/posts/show.rb`
+
+```ruby
+# ./app/views/posts/show.rb
+module Posts
+  class Show < ApplicationComponent
+    attr_accessor :post
+
+    def template(&)
+      h1 { @post.title }
+      div(class: "prose") { @post.body }
+    end
+  end
+end
+```
+
+Then include the `Posts` module in the controllers you'd like to use the views:
+
+```ruby
+class PostsController < ApplicationController
+  include Superview::Actions
+  include Posts # Add this to your controller 🚨
+
+  before_action :load_post
+
+  def show
+    respond_to do |format|
+      format.html { render Show.new.tap { _1.post = @post } }
+      format.json { render json: @post }
+    end
+  end
+
+  private
+    def load_post
+      @post = Post.find(params[:id])
+    end
+end
+```
+
+That's it! Ruby includes all the classes in the `Posts` module, which Superview picks up and renders in the controller. If you have an `Index`, `Edit`, `New`, etc. class in the `Posts` namespace, those would be implicitly rendered for their respective action.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
