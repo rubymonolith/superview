@@ -55,9 +55,9 @@ module Superview
         link_to([:edit, model],  *args, **kwargs, &content)
       end
 
-      def delete(model, *args, **kwargs, &content)
+      def delete(model, *args, confirm: nil, **kwargs, &content)
         content ||= Proc.new { "Delete #{model.class.model_name}" }
-        link_to(model, *args, method: :delete, **kwargs, &content)
+        link_to(model, *args, method: :delete, data_turbo_confirm: confirm, **kwargs, &content)
       end
 
       def create(scope = nil, *args, **kwargs, &content)
