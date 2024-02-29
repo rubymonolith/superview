@@ -54,8 +54,8 @@ module Superview
 
       before_action :assign_parent_collection, if: :has_parent_model?
       before_action :assign_parent_member, if: :has_parent_model?
-      before_action :assign_collection
-      before_action :assign_member
+      before_action :assign_collection, if: :has_model?
+      before_action :assign_member, if: :has_model?
     end
 
     protected
@@ -96,6 +96,10 @@ module Superview
 
     def has_parent_model?
       parent_model.present?
+    end
+
+    def has_model?
+      model.present?
     end
 
     def assign_member
