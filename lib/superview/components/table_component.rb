@@ -3,7 +3,7 @@ module Superview::Components
   # collection of the table.
   #
   # ```ruby
-  # render TableComponent.new(items: @posts) do |table|
+  # render TableComponent.new(@posts) do |table|
   #   # This is how you'd usually render a table.
   #   table.column("Title") { show(_1, :title) }
   #
@@ -41,13 +41,14 @@ module Superview::Components
       end
     end
 
-    def initialize(items: [])
+    def initialize(items = [], **attributes)
       @items = items
+      @attributes = attributes
       @columns = []
     end
 
     def template(&)
-      table do
+      table(**@attributes) do
         thead do
           tr do
             @columns.each do |column|
