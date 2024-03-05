@@ -53,7 +53,7 @@ module Superview
       class_attribute :model, :parent_model, :context_method_name
 
       before_action :assign_parent_collection, if: :has_parent_model?
-      before_action :assign_parent_member, if: :has_parent_model?
+      before_action :assign_parent_member, if: :has_parent_model_instance?
       before_action :assign_collection, if: :has_model?
       before_action :assign_member, if: :has_model?
     end
@@ -69,7 +69,7 @@ module Superview
     end
 
     def model_scope
-      if has_parent_model?
+      if has_parent_model_instance?
         parent_model_instance.association(model.model_name.collection)
       elsif has_assignable_context?
         assignable_context.association(model.model_name.collection).scope
@@ -96,6 +96,10 @@ module Superview
 
     def has_parent_model?
       parent_model.present?
+    end
+
+    def has_parent_model_instance?
+      has_parent_model? && params.key?(parent_model_param_key)
     end
 
     def has_model?
