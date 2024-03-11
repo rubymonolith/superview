@@ -68,19 +68,31 @@ module Superview
       instance_variable_set "@#{parent_model.model_name.plural}", parent_model_scope
     end
 
-    def model_scope
+    def model_association
       if has_parent_model_instance?
         parent_model_instance.association(model.model_name.collection)
       elsif has_assignable_context?
-        assignable_context.association(model.model_name.collection).scope
+        assignable_context.association(model.model_name.collection)
+      end
+    end
+
+    def model_scope
+      if association = model_association
+        association.scope
       else
         model.scope_for_association
       end
     end
 
-    def parent_model_scope
+    def parent_model_association
       if has_assignable_context?
         assignable_context.association(parent_model.model_name.collection)
+      end
+    end
+
+    def parent_model_scope
+      if association = parent_model_association
+        association.scope
       else
         parent_model.scope_for_association
       end
