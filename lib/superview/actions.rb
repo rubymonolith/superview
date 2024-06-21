@@ -69,12 +69,19 @@ module Superview
       phlex_action(action_name)
     end
 
-    # Try rendering with the regular Rails rendering methods; if those don't work
-    # then try finding the Phlex class that corresponds with the action_name. If that's
-    # found then tell Rails to call `default_phlex_render`.
+    # Checks if a Phlex class name is present for a controller action name
+    def phlex_action_exists?(action)
+      self.class.phlex_action_class(action: action).present?
+    end
+
+    # This is a built-in Rails method resolves the method to call for an action.
+    # If it resolves a Phlex class in the controller, it will render that. If it's
+    # not found it continues with Rails method of resolving action names.
     def method_for_action(action_name)
-      super || if self.class.phlex_action_class action: action_name
-                          "default_phlex_render"
+      if phlex_action_exists? action_name
+        "default_phlex_render"
+      else
+        super
       end
     end
 
