@@ -16,7 +16,7 @@ module Superview
   #   class Show < ApplicationComponent
   #     attr_accessor :post
   #
-  #     def template(&)
+  #     def view_template(&)
   #       h1 { @post.title }
   #       div(class: "prose") { @post.body }
   #     end

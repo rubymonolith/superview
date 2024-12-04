@@ -47,7 +47,7 @@ module Superview::Components
       @columns = []
     end
 
-    def template(&)
+    def view_template(&)
       table(**@attributes) do
         thead do
           tr do

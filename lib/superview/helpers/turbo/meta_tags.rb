@@ -20,7 +20,7 @@ module Superview
           @page_requires_reload = page_requires_reload
         end
 
-        def template
+        def view_template
           meta(name: "turbo-refresh-method", content: @method)
           meta(name: "turbo-refresh-scroll", content: @scroll)
           meta(name: "turbo-cache-control", content: "no-cache") if @exempts_page_from_cache
