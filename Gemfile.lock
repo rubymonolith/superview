@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     superview (0.1.2)
-      phlex-rails (~> 1.0)
+      phlex-rails (>= 1.0, < 3.0)
       zeitwerk (~> 2.0)
 
 GEM

@@ -19,8 +19,18 @@ module Superview::Components
   #   end
   # end
   # ```
+
   class TableComponent < ApplicationComponent
-    include Phlex::DeferredRender
+    if Phlex.const_defined?(:DeferredRender)
+      # Phlex 1.0
+      include Phlex::DeferredRender
+    else
+      # Phlex 2.0
+      def before_template(&)
+        vanish(&)
+        super
+      end
+    end
 
     class Column
       attr_accessor :title_template, :item_template
