@@ -7,17 +7,6 @@ module Superview
         register_element :turbo_cable_stream_source
       end
 
-      class_methods do
-        def turbo(*args, **kwargs, &block)
-          @turbo_meta_tags = MetaTags.new(*args, **kwargs)
-          define_method(:turbo, &block) if block
-        end
-
-        def turbo_meta_tags
-          @turbo_meta_tags ||= MetaTags.new
-        end
-      end
-
       def turbo_stream_from(*streamables, **attributes)
         attributes[:channel] = attributes[:channel]&.to_s || "Turbo::StreamsChannel"
         attributes[:"signed-stream-name"] = ::Turbo::StreamsChannel.signed_stream_name(streamables)
