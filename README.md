@@ -88,7 +88,12 @@ class PostsController < ApplicationController
 
   def show
     respond_to do |format|
-      format.html { render Show.new.tap { _1.post = @post } }
+      format.html { render phlex }
+      # These would also work...
+      # format.html { render Show.new.tap { _1.post = @post } }
+      # format.html { render phlex Show.new }
+      # format.html { render phlex Show }
+      # format.html { render phlex :show }
       format.json { render json: @post }
     end
   end
@@ -98,6 +103,37 @@ class PostsController < ApplicationController
       @post = Post.find(params[:id])
     end
 end
+```
+
+### Rendering other Phlex actions from different actions
+
+It's common to have to render form actions from other actions when forms are saved. In this example the `create` method renders the `phlex New` view when the form is invalid.
+
+```ruby
+class PostsController < ApplicationController
+  include Superview::Actions
+
+  def create
+    @post = Post.new(post_params)
+
+    if @post.save
+      redirect_to @post
+    else
+      render phlex New
+      # These would also work...
+      # render New.new.tap { _1.post = @post }
+      # render phlex New.new
+      # render phlex New
+      # render phlex :new
+    end
+  end
+
+  private
+    def load_post
+      @post = Post.find(params[:id])
+    end
+end
+
 ```
 
 ### Extracting inline views into the `./app/views` folder
