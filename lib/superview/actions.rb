@@ -49,8 +49,8 @@ module Superview
     # on Phlex. For example, if a controller defines @users and a Phlex class has
     # `attr_writer :users`, `attr_accessor :user`, or `def users=`, it will be automatically
     # set by this method.
-    def assign_phlex_accessors(phlex_view)
-      phlex_view.tap do |view|
+    def assign_phlex_accessors(view)
+      view.tap do |view|
         view_assigns.each do |variable, value|
           attr_writer_name = "#{variable}="
           view.send attr_writer_name, value if view.respond_to? attr_writer_name
@@ -58,15 +58,26 @@ module Superview
       end
     end
 
-    # Initializers a Phlex view based on the action name, then assigns `view_assigns`
-    # to the view.
+    # Initializers a Phlex view based on the action name and assigns accessors
     def phlex_action(action)
-      assign_phlex_accessors self.class.phlex_action_class(action: action).new
+      phlex_view self.class.phlex_action_class(action: action)
+    end
+
+    # Initializes a phlex view class and assigns accessors.
+    def phlex_view(view_class)
+      assign_phlex_accessors view_class.new
     end
 
     # Phlex action for the current action.
-    def phlex
-      phlex_action(action_name)
+    def phlex(target = action_name)
+      case target
+      when Phlex::HTML
+        assign_phlex_accessors target
+      when Symbol, String
+        phlex_action target
+      when Class
+        phlex_view target
+      end
     end
 
     # Checks if a Phlex class name is present for a controller action name
