@@ -89,11 +89,9 @@ module Superview
     # If it resolves a Phlex class in the controller, it will render that. If it's
     # not found it continues with Rails method of resolving action names.
     def method_for_action(action_name)
-      if phlex_action_exists? action_name
-        "default_phlex_render"
-      else
-        super
-      end
+      super || if phlex_action_exists? action_name
+                 "default_phlex_render"
+               end
     end
 
     # Renders a Phlex view for the given action, if it's present.
