@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-
+require "phlex"
 require "superview"
 
 RSpec.configure do |config|
