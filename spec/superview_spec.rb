@@ -21,6 +21,17 @@ class PostsController < ActionController::Base
     end
   end
 
+  class Edit < ViewComponent::Base
+    attr_writer :post
+
+    def call
+      <<~HTML
+        h1 { "Edit #{@post.title}" }
+        div(class: "prose") { "#{@post.body}" }
+      HTML
+    end
+  end
+
   def new
     render inline: "Don't hit new"
   end
@@ -54,6 +65,7 @@ RSpec.describe PostsController, type: :controller do
     Rails.application.routes.draw do
       get "posts/show", to: "posts#show"
       get "posts/new", to: "posts#new"
+      get "posts/edit", to: "posts#edit"
       get "posts/a_class", to: "posts#a_class"
       get "posts/an_instance", to: "posts#an_instance"
       get "posts/a_string", to: "posts#a_string"
@@ -85,6 +97,14 @@ RSpec.describe PostsController, type: :controller do
     it "renders the Phlex view for the action" do
       get :a_class
       expect(response.body).to include("Test Post")
+    end
+  end
+
+  describe "GET #edit" do
+    it "renders the Phlex view for the action" do
+      get :edit
+      expect(response.body).to include("Edit Test Post")
+      expect(response.body).to include("This is a test body.")
     end
   end
 

@@ -3,6 +3,7 @@ require "action_controller/railtie"
 require "rspec/rails"
 require "spec_helper"
 require "phlex-rails"
+require "view_component"
 
 # Configure a minimal application for ActionController
 class TestApplication < Rails::Application
