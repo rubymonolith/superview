@@ -1,8 +1,12 @@
 # Superview
 
-Build Rails applications, from the ground up, using [Phlex](https://www.phlex.fun/) components, like this.
+> ## 🏗️ Work in progress 👷‍♂️
+> These docs show what Superview will look like when it supports ViewComponent. The docs for the current gem, 0.1.3, that's phlex only is at https://github.com/rubymonolith/superview/blob/v0.1.3/README.md.
+
+Build Rails applications, from the ground up, using [Phlex](https://www.phlex.fun/) or [ViewComponent](https://viewcomponent.org/) components, like this.
 
 ```ruby
+# ./app/controllers/posts_controller.rb
 class PostsController < ApplicationController
   include Superview::Actions
 
@@ -14,6 +18,21 @@ class PostsController < ApplicationController
     def view_template(&)
       h1 { @post.title }
       div(class: "prose") { @post.body }
+    end
+  end
+
+  class Edit < ViewComponent::Base
+    attr_accessor :post
+
+    def call
+      <<~HTML
+        <h1>Edit #{@post.title}</h1>
+        <form action="<%= post_path(@post) %>" method="post">
+          <input type="text" name="title" value="<%= @post.title %>">
+          <textarea name="body"><%= @post.body %></textarea>
+          <button type="submit">Save</button>
+        </form>
+      HTML
     end
   end
 
@@ -41,13 +60,22 @@ If bundler is not being used to manage dependencies, install the gem by executin
 
 ## Usage
 
-Install `phlex-rails` in your Rails application.
-
-    $ bin/rails generate phlex:install
-
-Then add `include Superview::Actions` to any controllers you'd like to render Phlex components.
+Add `include Superview::Actions` to any controllers you'd like to render components as controller actions.
 
 ```ruby
+# ./app/controllers/posts_controller.rb
+class PostsController < ApplicationController
+   # 🚨 Add this 👇 to your controller 🚨
+  include Superview::Actions
+
+  # Your code...
+end
+```
+
+Then add classes to your controller that map to the actions you'd like to render. The `Show` class will render when the `PostsController#show` action is called and the `Edit` class will render when the `PostsController#edit` action is called.
+
+```ruby
+# ./app/controllers/posts_controller.rb
 class PostsController < ApplicationController
   include Superview::Actions
 
@@ -62,6 +90,21 @@ class PostsController < ApplicationController
     end
   end
 
+  class Edit < ViewComponent::Base
+    attr_accessor :post
+
+    def call
+      <<~HTML
+        <h1>Edit #{@post.title}</h1>
+        <form action="<%= post_path(@post) %>" method="post">
+          <input type="text" name="title" value="<%= @post.title %>">
+          <textarea name="body"><%= @post.body %></textarea>
+          <button type="submit">Save</button>
+        </form>
+      HTML
+    end
+  end
+
   private
     def load_post
       @post = Post.find(params[:id])
@@ -69,13 +112,16 @@ class PostsController < ApplicationController
 end
 ```
 
-The `Show` class will render when the `PostsController#show` action is called. To use along side other formats or render manually, you can define the `PostsController#show` as you'd expect:
+### Explicit rendering
+
+You can explicitly render a component in a controller action method. In this example, we needed to render a the `Show` component in the `html` format and a JSON response in the `json` format.
 
 ```ruby
+# ./app/controllers/posts_controller.rb
 class PostsController < ApplicationController
   include Superview::Actions
 
-  before_action :load_post
+  # Your code...
 
   class Show < ApplicationComponent
     attr_accessor :post
@@ -88,28 +134,28 @@ class PostsController < ApplicationController
 
   def show
     respond_to do |format|
-      format.html { render phlex }
-      # These would also work...
+      # 👋 Renders the Show component
+      format.html { render component }
+
+      # 👉 These would also work...
       # format.html { render Show.new.tap { _1.post = @post } }
-      # format.html { render phlex Show.new }
-      # format.html { render phlex Show }
-      # format.html { render phlex :show }
+      # format.html { render component Show.new }
+      # format.html { render component Show }
+      # format.html { render component :show }
       format.json { render json: @post }
     end
   end
 
-  private
-    def load_post
-      @post = Post.find(params[:id])
-    end
+  # Your code...
 end
 ```
 
-### Rendering other Phlex actions from different actions
+### Rendering other classes from different actions
 
-It's common to have to render form actions from other actions when forms are saved. In this example the `create` method renders the `phlex New` view when the form is invalid.
+It's common to have to render form actions from other actions when forms are saved. In this example the `create` method renders the `component New` view when the form is invalid.
 
 ```ruby
+# ./app/controllers/posts_controller.rb
 class PostsController < ApplicationController
   include Superview::Actions
 
@@ -119,21 +165,19 @@ class PostsController < ApplicationController
     if @post.save
       redirect_to @post
     else
-      render phlex New
-      # These would also work...
+      # 👋 Renders the New component from the create action.
+      render component New
+
+      # 👉 These would also work...
       # render New.new.tap { _1.post = @post }
-      # render phlex New.new
-      # render phlex New
-      # render phlex :new
+      # render component New.new
+      # render component New
+      # render component :new
     end
   end
 
-  private
-    def load_post
-      @post = Post.find(params[:id])
-    end
+  # Your code...
 end
-
 ```
 
 ### Extracting inline views into the `./app/views` folder
@@ -159,9 +203,11 @@ end
 Then include the `Posts` module in the controllers you'd like to use the views:
 
 ```ruby
+# ./app/controllers/posts_controller.rb
 class PostsController < ApplicationController
   include Superview::Actions
-  include Posts # Add this to your controller 🚨
+  # 🚨 Add this 👇 to your controller 🚨
+  include Posts
 
   before_action :load_post
 
@@ -180,6 +226,24 @@ end
 ```
 
 That's it! Ruby includes all the classes in the `Posts` module, which Superview picks up and renders in the controller. If you have an `Index`, `Edit`, `New`, etc. class in the `Posts` namespace, those would be implicitly rendered for their respective action.
+
+### View path class mappings
+
+Not all component libraries are integrated into Rails views, so you might have to manually configure the view paths in your Rails application. This instructs the Rails code reloader, Zeitwerk, to load the components.
+
+```ruby
+# ./config/application.rb
+module MyApp
+  class Application < Rails::Application
+    config.autoload_paths << "#{root}/app/views"
+    config.autoload_paths << "#{root}/app/views/layouts"
+    config.autoload_paths << "#{root}/app/views/components"
+    # Your code
+  end
+end
+```
+
+For example, the `Show` component in the `Posts` module would be loaded from `./app/views/posts/show.rb` and the `Layout` component in the `Layouts` module would be loaded from `./app/views/layouts/layout.rb`.
 
 ## Development
 
