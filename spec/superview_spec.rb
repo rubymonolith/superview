@@ -93,18 +93,18 @@ RSpec.describe PostsController, type: :controller do
     end
   end
 
-  describe "GET #a_class" do
-    it "renders the Phlex view for the action" do
-      get :a_class
-      expect(response.body).to include("Test Post")
-    end
-  end
-
   describe "GET #edit" do
     it "renders the Phlex view for the action" do
       get :edit
       expect(response.body).to include("Edit Test Post")
       expect(response.body).to include("This is a test body.")
+    end
+  end
+
+  describe "GET #a_class" do
+    it "renders the Phlex view for the action" do
+      get :a_class
+      expect(response.body).to include("Test Post")
     end
   end
 
