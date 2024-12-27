@@ -55,7 +55,7 @@ class PostsController < ActionController::Base
   private
 
   def load_post
-    @post = OpenStruct.new(title: "Test Post", body: "This is a test body.")
+    @post = Struct.new(:title, :body).new("Test Post", "This is a test body.")
   end
 end
 
