@@ -1,8 +1,5 @@
 # Superview
 
-> ## 🏗️ Work in progress 👷‍♂️
-> These docs show what Superview will look like when it supports ViewComponent. The docs for the current gem, 0.1.3, that's phlex only is at https://github.com/rubymonolith/superview/blob/v0.1.3/README.md.
-
 Build Rails applications, from the ground up, using [Phlex](https://www.phlex.fun/) or [ViewComponent](https://viewcomponent.org/) components, like this.
 
 ```ruby
